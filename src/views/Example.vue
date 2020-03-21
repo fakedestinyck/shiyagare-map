@@ -1,6 +1,14 @@
 <template>
     <div style="height: 100vh; width: 100%">
-        <GmapMap :center="currentCenter" :zoom="currentZoom" map-type-id="roadmap" style="width: 100%; height: 100%" :options="googlemap_options" ref="mapRef">
+        <GmapMap
+            :center="currentCenter"
+            :zoom="currentZoom"
+            map-type-id="roadmap"
+            style="width: 100%; height: 100%"
+            :options="googlemap_options"
+            ref="mapRef"
+            @center_changed="centerUpdate"
+        >
             <gmap-info-window :options="infoOptions" :position="infoWindowPos" :opened="infoWinOpen" @closeclick="infoWinOpen = false"></gmap-info-window>
             <GmapMarker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" :draggable="false" @click="toggleInfoWindow(m, index)" title="test" />
         </GmapMap>
@@ -10,7 +18,7 @@
 <script>
 import { latLng } from 'leaflet';
 import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet';
-import {gmapApi} from 'vue2-google-maps';
+import { gmapApi } from 'vue2-google-maps';
 export default {
     name: 'Example',
     components: {
@@ -41,10 +49,19 @@ export default {
                         lat: 35.66634784801858,
                         lng: 139.75972976237588
                     },
-                    infoText: '<strong>Marker 1</strong>'
+                    storeName: 'ビーフン東',
+                    storeType: '台湾料理'
                 },
-                { position: { lat: 10, lng: 11 } },
-                { position: { lat: 11, lng: 10 } },
+                {
+                    position: latLng(35.662321731008, 139.71284374442),
+                    storeName: 'シターラ',
+                    storeType: 'インド料理'
+                },
+                {
+                    position: latLng(35.70557828544182, 139.7736611957639),
+                    storeName: '羊香味坊',
+                    storeType: '中華料理'
+                },
                 { position: { lat: 9, lng: 10 } },
                 { position: { lat: 10, lng: 9 } }
             ],
@@ -76,13 +93,13 @@ export default {
     },
     computed: {
         google: gmapApi
-      },
+    },
     methods: {
         zoomUpdate(zoom) {
             this.currentZoom = zoom;
         },
         centerUpdate(center) {
-            this.currentCenter = center;
+            console.log(center.lat());
         },
         showLongText() {
             this.showParagraph = !this.showParagraph;
@@ -93,10 +110,10 @@ export default {
         toggleInfoWindow: function(marker, idx) {
             this.$refs.mapRef.$mapPromise.then(map => {
                 map.panTo(marker.position);
-                this.smoothZoom(map, 19, this.currentZoom);
+                this.smoothZoom(map, 19, this.currentZoom, marker.position);
             });
             this.infoWindowPos = marker.position;
-            this.infoOptions.content = marker.infoText;
+            this.infoOptions.content = `<p class="tag-store-name">${marker.storeName}<span class="tag">${marker.storeType}</span></p>`;
             console.log(marker);
 
             //check if its the same marker that was selected if yes toggle
@@ -110,15 +127,17 @@ export default {
             }
         },
         // the smooth zoom function
-        smoothZoom(map, max, cnt) {
+        smoothZoom(map, max, cnt, toPosition) {
             if (cnt >= max) {
+                this.currentZoom = 19;
+                this.currentCenter = toPosition;
                 return;
             } else {
                 let that = this;
                 this.$refs.mapRef.$mapPromise.then(map => {
                     var z = this.google.maps.event.addListener(map, 'zoom_changed', function(event) {
                         that.google.maps.event.removeListener(z);
-                        that.smoothZoom(map, max, cnt + 1);
+                        that.smoothZoom(map, max, cnt + 1, toPosition);
                     });
                     setTimeout(function() {
                         map.setZoom(cnt);
@@ -129,3 +148,16 @@ export default {
     }
 };
 </script>
+<style scoped>
+>>>.tag {
+    border: 5px solid transparent;
+    color: lightcoral;
+    margin-left: 10px;
+    background-color: lightgray;
+    border-radius: 5px;
+}
+>>>.tag-store-name {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+</style>
