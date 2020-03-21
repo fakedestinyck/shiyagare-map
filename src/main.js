@@ -5,6 +5,7 @@ import router from './router'
 import './plugins/element.js'
 import './plugins/leaflet.js'
 import "leaflet/dist/leaflet.css"
+import './plugins/googlemaps.js'
 
 // Fix leaflet missing icon problem
 import L from 'leaflet';
