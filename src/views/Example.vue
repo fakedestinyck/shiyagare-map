@@ -73,7 +73,7 @@ export default {
                 rotateControl: false,
                 fullscreenControl: true,
                 disableDefaultUI: true,
-                clickableIcons: true,
+                clickableIcons: false,
                 gestureHandling: 'cooperative',
                 backgroundColor: 'white'
             },

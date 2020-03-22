@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === 'production') {
         updated() {
             MessageBox({
                 title: '更新',
-                message: '新版本内容下载完成，点击确定按钮立即使用新版',
+                message: '新版本内容下载完成，\n点击确定按钮立即使用新版',
                 confirmButtonText: '确定',
                 showClose: false,
                 showCancelButton: false,
