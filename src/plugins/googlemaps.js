@@ -25,5 +25,6 @@ Vue.use(VueGoogleMaps, {
   //// then set installComponents to 'false'.
   //// If you want to automatically install all the components this property must be set to 'true':
   installComponents: true,
+  region: 'CN',
   loadCn: true
 })
